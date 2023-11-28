@@ -1,0 +1,54 @@
+import random
+import string
+
+def is_strong_password(password, min_length, requires_uppercase, requires_digit, requires_special, disallow_common_words):
+    # Password strength criteria
+    length_ok = len(password) >= min_length
+    contains_uppercase = any(char.isupper() for char in password)
+    contains_digit = any(char.isdigit() for char in password)
+    contains_special = any(char in string.punctuation for char in password)
+    common_words = ["password", "123456", "admin", "qwerty"]
+    not_in_dictionary = not any(word in password.lower() for word in common_words)
+
+    # Check if password meets the criteria
+    if not length_ok:
+        return "Weak: Password is too short."
+    if requires_uppercase and not contains_uppercase:
+        return "Weak: Password does not contain uppercase letters."
+    if requires_digit and not contains_digit:
+        return "Weak: Password does not contain digits."
+    if requires_special and not contains_special:
+        return "Weak: Password does not contain special characters."
+    if disallow_common_words and not not_in_dictionary:
+        return "Weak: Password contains common words."
+
+    return "Strong: Password meets all criteria."
+
+def generate_password(password_length, requires_uppercase, requires_digit, requires_special, disallow_common_words):
+    pool = string.ascii_letters
+    if requires_uppercase:
+        pool += string.ascii_uppercase
+    if requires_digit:
+        pool += string.digits
+    if requires_special:
+        pool += string.punctuation
+
+    while True:
+        password = ''.join(random.choice(pool) for _ in range(password_length))
+        strength = is_strong_password(password, password_length, requires_uppercase, requires_digit, requires_special, disallow_common_words)
+        if "Strong" in strength:
+            return password
+
+def main():
+    max_length = 30  # Maximum password length
+    password_length = int(input(f"Enter the desired password length (up to {max_length} characters): "))
+    requires_uppercase = input("Require uppercase letters? (y/n): ").lower() == "y"
+    requires_digit = input("Require digits? (y/n): ").lower() == "y"
+    requires_special = input("Require special characters? (y/n): ").lower() == "y"
+    disallow_common_words = input("Disallow common words? (y/n): ").lower() == "y"
+
+    password = generate_password(password_length, requires_uppercase, requires_digit, requires_special, disallow_common_words)
+    print(f"Generated password: {password}")
+
+if __name__ == "__main__":
+    main()
